@@ -31,4 +31,6 @@ public:
 	Model* model_ = nullptr;
 	WorldTransform worldTransform_;
 	ViewProjection viewProjection_;
+	Input* input_ = nullptr;
+
 };
