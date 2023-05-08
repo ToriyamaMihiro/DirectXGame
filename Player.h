@@ -10,6 +10,7 @@
 #include "WorldTransform.h"
 
 #include "PlayerBullet.h"
+//#include "math.h"
 #include<list>
 class Player {
 

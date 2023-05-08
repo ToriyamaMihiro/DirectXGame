@@ -4,7 +4,6 @@
 #include "TextureManager.h"
 #include <cassert>
 
-
 Player::~Player() {
 	for (PlayerBullet* bullet : bullets_) {
 		delete bullet;
@@ -22,12 +21,18 @@ void Player::Initialize(Model* model, uint32_t textureHandle, WorldTransform wor
 }
 
 void Player::Update() {
+
+	bullets_.remove_if([](PlayerBullet* bullet) {
+		if (bullet->IsDead()) {
+			delete bullet;
+			return true;
+		}
+	});
 	Vector3 move = {0, 0, 0}; // 移動ベクトル
 
 	const float kCharactorSpeed = 0.2f;
 
 	if (input_->PushKey(DIK_LEFT)) {
-
 		move.x -= kCharactorSpeed;
 	} else if (input_->PushKey(DIK_RIGHT)) {
 		move.x += kCharactorSpeed;
@@ -93,10 +98,17 @@ void Player::Draw(ViewProjection& viewProjection) {
 
 void Player::Attack() {
 	if (input_->TriggerKey(DIK_SPACE)) {
-		
-		PlayerBullet* newBullet = new PlayerBullet();
-		newBullet->Initialize(model_, worldTransform_.translation_);
 
+		// 弾の速度
+		const float kBulletSpeed = 1.0f;
+		Vector3 velocity(0, 0, kBulletSpeed);
+
+		// 速度ベクトルを自機の向きに合わせて回転する
+		velocity = TransformNormal(velocity, worldTransform_.matWorld_);
+
+		// 弾を生成して初期化
+		PlayerBullet* newBullet = new PlayerBullet();
+		newBullet->Initialize(model_, worldTransform_.translation_, velocity);
 
 		bullets_.push_back(newBullet);
 		/*if (bullet_) {

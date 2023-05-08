@@ -24,3 +24,5 @@ Matrix4x4 Multiply(const Matrix4x4& m1, const Matrix4x4& m2);
 
 Vector3 Transform(Vector3& vector, Matrix4x4 matrix);
 
+Vector3 TransformNormal(const Vector3& v, const Matrix4x4& m);
+
