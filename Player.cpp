@@ -4,6 +4,13 @@
 #include "TextureManager.h"
 #include <cassert>
 
+
+Player::~Player() {
+	for (PlayerBullet* bullet : bullets_) {
+		delete bullet;
+	}
+}
+
 void Player::Initialize(Model* model, uint32_t textureHandle, WorldTransform worldTransform) {
 	assert(model);
 	model_ = model;
@@ -15,11 +22,9 @@ void Player::Initialize(Model* model, uint32_t textureHandle, WorldTransform wor
 }
 
 void Player::Update() {
-	Vector3 move = {0, 0, 0}; // ˆÚ“®ƒxƒNƒgƒ‹
+	Vector3 move = {0, 0, 0}; // ç§»å‹•ãƒ™ã‚¯ãƒˆãƒ«
 
 	const float kCharactorSpeed = 0.2f;
-
-	
 
 	if (input_->PushKey(DIK_LEFT)) {
 
@@ -32,7 +37,7 @@ void Player::Update() {
 		move.y -= kCharactorSpeed;
 	}
 
-	// ¶‰Eã‰ºˆÚ“®
+	// å·¦å³ä¸Šä¸‹ç§»å‹•
 	MakeScaleMatrix(worldTransform_.scale_);
 
 	MakeRatateXMatrix(worldTransform_.rotation_.x);
@@ -46,7 +51,7 @@ void Player::Update() {
 	    worldTransform_.scale_, worldTransform_.rotation_, worldTransform_.translation_);
 	worldTransform_.UpdateMatrix();
 
-	worldTransform_.translation_.x += move.x; // ƒvƒŒƒCƒ„[‚ÌÀ•W + ˆÚ“®ƒxƒNƒgƒ‹
+	worldTransform_.translation_.x += move.x; // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®åº§æ¨™ + ç§»å‹•ãƒ™ã‚¯ãƒˆãƒ«
 	worldTransform_.translation_.y += move.y;
 
 	ImGui::Begin("Debug1");
@@ -58,16 +63,16 @@ void Player::Update() {
 
 	const float kMoveLimitX = 34;
 	const float kMoveLimitY = 19;
-	// ˆÚ“®”ÍˆÍ‚ÌŽw’è
+	// ç§»å‹•ç¯„å›²ã®æŒ‡å®š
 	worldTransform_.translation_.x = max(worldTransform_.translation_.x, -kMoveLimitX);
 	worldTransform_.translation_.x = min(worldTransform_.translation_.x, +kMoveLimitX);
 	worldTransform_.translation_.y = max(worldTransform_.translation_.y, -kMoveLimitY);
 	worldTransform_.translation_.y = min(worldTransform_.translation_.y, +kMoveLimitY);
 
-	//’e‚Ì”­ŽË
+	// å¼¾ã®ç™ºå°„
 	Attack();
-	if (bullet_) {
-		bullet_->Update();
+	for (PlayerBullet* bullet : bullets_) {
+		bullet->Update();
 	}
 }
 
@@ -81,16 +86,22 @@ void Player::Rotate() {
 }
 void Player::Draw(ViewProjection& viewProjection) {
 	model_->Draw(worldTransform_, viewProjection, textureHandle_);
-	if (bullet_) {
-		bullet_->Draw(viewProjection);
+	for (PlayerBullet* bullet : bullets_) {
+		bullet->Draw(viewProjection);
 	}
 }
 
 void Player::Attack() {
-	if (input_->PushKey(DIK_SPACE)) {
+	if (input_->TriggerKey(DIK_SPACE)) {
+		
 		PlayerBullet* newBullet = new PlayerBullet();
 		newBullet->Initialize(model_, worldTransform_.translation_);
 
-		bullet_ = newBullet;
+
+		bullets_.push_back(newBullet);
+		/*if (bullet_) {
+		    delete bullet_;
+		    bullet_ = nullptr;
+		}*/
 	}
 }

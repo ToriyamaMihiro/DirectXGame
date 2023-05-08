@@ -10,9 +10,16 @@
 #include "WorldTransform.h"
 
 #include "PlayerBullet.h"
+#include<list>
 class Player {
 
 public:
+//std::list<PlayerBullet*>bullets_;
+	/// <summary>
+	/// デストラクタ
+	/// </summary>
+	~Player();
+
 	/// <summary>
 	/// 初期化
 	/// </summary>
@@ -38,5 +45,5 @@ private:
 	WorldTransform worldTransform_;
 	ViewProjection viewProjection_;
 	Input* input_ = nullptr;
-	PlayerBullet* bullet_ = nullptr;
+	std::list<PlayerBullet*> bullets_;
 };
