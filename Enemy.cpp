@@ -18,11 +18,10 @@ void Enemy::Initialize(Model* model, uint32_t textureHandle, WorldTransform worl
 
 void Enemy::Update() {
 
+	//移動
 	Vector3 move = {0, 0, 0}; // 移動ベクトル
 
 	const float kCharactorSpeed = -0.2f;
-
-	move.z += kCharactorSpeed;
 
 	MakeScaleMatrix(worldTransform_.scale_);
 
@@ -48,11 +47,31 @@ void Enemy::Update() {
 
 	const float kMoveLimitX = 34;
 	const float kMoveLimitY = 19;
-	// 移動範囲の指定
-	worldTransform_.translation_.x = max(worldTransform_.translation_.x, -kMoveLimitX);
-	worldTransform_.translation_.x = min(worldTransform_.translation_.x, +kMoveLimitX);
-	worldTransform_.translation_.y = max(worldTransform_.translation_.y, -kMoveLimitY);
-	worldTransform_.translation_.y = min(worldTransform_.translation_.y, +kMoveLimitY);
+	//// 移動範囲の指定
+	//worldTransform_.translation_.x = max(worldTransform_.translation_.x, -kMoveLimitX);
+	//worldTransform_.translation_.x = min(worldTransform_.translation_.x, +kMoveLimitX);
+	//worldTransform_.translation_.y = max(worldTransform_.translation_.y, -kMoveLimitY);
+	//worldTransform_.translation_.y = min(worldTransform_.translation_.y, +kMoveLimitY);
+
+	//行動パターン
+	switch (phase_) {
+	case Phase::Approach:
+		move.z += kCharactorSpeed;
+		worldTransform_.translation_.z += move.z;
+		if (worldTransform_.translation_.z < 0.0f) {
+			phase_ = Phase::Leave;
+		}
+		break;
+	case Phase::Leave:
+		move.x += kCharactorSpeed;
+		move.y += kCharactorSpeed;
+		worldTransform_.translation_.x += move.x;
+		worldTransform_.translation_.y -= move.y;
+		break;
+	default:
+		break;
+	}
+
 }
 
 void Enemy::Draw(ViewProjection& viewProjection) {

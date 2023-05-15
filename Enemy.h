@@ -12,6 +12,11 @@
 // #include "math.h"
 #include <list>
 
+enum class Phase {
+	Approach,
+	Leave,
+};
+
 class Enemy {
 
 public:
@@ -37,10 +42,11 @@ public:
 	void Draw(ViewProjection& viewProjection);
 
 private:
+
 	uint32_t textureHandle_ = 0u;
 	Model* model_ = nullptr;
 	WorldTransform worldTransform_;
 	ViewProjection viewProjection_;
 	Input* input_ = nullptr;
-	std::list<PlayerBullet*> bullets_;
+	Phase phase_ = Phase::Approach;
 };

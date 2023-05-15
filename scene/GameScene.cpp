@@ -32,6 +32,7 @@ void GameScene::Initialize() {
 	player_->Initialize(model_, textureHandle_, worldTransform_);
 
 	enemyWorldTransform_.translation_.y = 1;
+	enemyWorldTransform_.translation_.z = 20;
 	enemy_ = new Enemy();
 	enemy_->Initialize(enemyModel_, enemyTextureHandle_, enemyWorldTransform_);
 	
