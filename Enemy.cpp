@@ -4,7 +4,11 @@
 #include "TextureManager.h"
 #include <cassert>
 
-Enemy::~Enemy() {}
+Enemy::~Enemy() {
+	for (EnemyBullet* bullet : bullets_) {
+		delete bullet;
+	}
+}
 
 void Enemy::Initialize(Model* model, uint32_t textureHandle, WorldTransform worldTransform) {
 	assert(model);
@@ -14,14 +18,25 @@ void Enemy::Initialize(Model* model, uint32_t textureHandle, WorldTransform worl
 	input_ = Input::GetInstance();
 	worldTransform_.Initialize();
 	viewProjection_.Initialize();
+	//Fire();
+	ApproachInitialize();
 }
 
 void Enemy::Update() {
 
-	//移動
+	bullets_.remove_if([](EnemyBullet* bullet) {
+		if (bullet->IsDead()) {
+			delete bullet;
+			return true;
+		}
+	});
+
+	// 移動
 	Vector3 move = {0, 0, 0}; // 移動ベクトル
 
-	const float kCharactorSpeed = -0.2f;
+	const float kCharactorSpeed = +0.1f;
+
+	move.x += kCharactorSpeed;
 
 	MakeScaleMatrix(worldTransform_.scale_);
 
@@ -36,25 +51,24 @@ void Enemy::Update() {
 	    worldTransform_.scale_, worldTransform_.rotation_, worldTransform_.translation_);
 	worldTransform_.UpdateMatrix();
 
-	worldTransform_.translation_.z += move.z; // プレイworldTransform_.translation_.y += move.y;
+	worldTransform_.translation_.x += move.x; // プレイworldTransform_.translation_.y += move.y;
 
 	ImGui::Begin("Debug1");
-	ImGui::Text("%f", worldTransform_.translation_.x);
-	ImGui::Text("%f", worldTransform_.translation_.y);
-	ImGui::Text("%f", worldTransform_.translation_.z);
+	ImGui::Text("%f", fire_timer);
+
 
 	ImGui::End();
 
 	const float kMoveLimitX = 34;
 	const float kMoveLimitY = 19;
 	//// 移動範囲の指定
-	//worldTransform_.translation_.x = max(worldTransform_.translation_.x, -kMoveLimitX);
-	//worldTransform_.translation_.x = min(worldTransform_.translation_.x, +kMoveLimitX);
-	//worldTransform_.translation_.y = max(worldTransform_.translation_.y, -kMoveLimitY);
-	//worldTransform_.translation_.y = min(worldTransform_.translation_.y, +kMoveLimitY);
+	// worldTransform_.translation_.x = max(worldTransform_.translation_.x, -kMoveLimitX);
+	// worldTransform_.translation_.x = min(worldTransform_.translation_.x, +kMoveLimitX);
+	// worldTransform_.translation_.y = max(worldTransform_.translation_.y, -kMoveLimitY);
+	// worldTransform_.translation_.y = min(worldTransform_.translation_.y, +kMoveLimitY);
 
-	//行動パターン
-	switch (phase_) {
+	// 行動パターン
+	/*switch (phase_) {
 	case Phase::Approach:
 		move.z += kCharactorSpeed;
 		worldTransform_.translation_.z += move.z;
@@ -70,10 +84,43 @@ void Enemy::Update() {
 		break;
 	default:
 		break;
+	}*/
+	ApproachUpdate();
+	for (EnemyBullet* bullet : bullets_) {
+		bullet->Update();
 	}
+}
 
+void Enemy::Fire() {
+	const float kBulletSpeed = -0.2f;
+	Vector3 velocity(0, 0, kBulletSpeed);
+
+	// 速度ベクトルを自機の向きに合わせて回転する
+	velocity = TransformNormal(velocity, worldTransform_.matWorld_);
+
+	// 弾を生成して初期化
+	EnemyBullet* newBullet = new EnemyBullet();
+	newBullet->Initialize(model_, worldTransform_.translation_, velocity);
+
+	bullets_.push_back(newBullet);
+}
+
+void Enemy::ApproachInitialize() {
+	
+	fire_timer = kFireInterval;
+}
+
+void Enemy::ApproachUpdate() {
+	fire_timer--;
+	if (fire_timer == 0) {
+		Fire();
+		fire_timer = kFireInterval;
+	}
 }
 
 void Enemy::Draw(ViewProjection& viewProjection) {
 	model_->Draw(worldTransform_, viewProjection, textureHandle_);
+	for (EnemyBullet* bullet : bullets_) {
+		bullet->Draw(viewProjection);
+	}
 }
