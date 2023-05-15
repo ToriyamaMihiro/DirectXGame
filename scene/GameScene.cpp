@@ -8,6 +8,7 @@ GameScene::GameScene() {}
 GameScene::~GameScene() {
 	delete model_;
 	delete player_;
+	delete enemy_;
 	delete debugCamera_;
 }
 
@@ -17,19 +18,29 @@ void GameScene::Initialize() {
 	input_ = Input::GetInstance();
 	audio_ = Audio::GetInstance();
 	textureHandle_ = TextureManager::Load("sora_kh.png");
+	enemyTextureHandle_ = TextureManager::Load("syadow_kh.png");
 	model_ = Model::Create();
+	enemyModel_ = Model::Create();
 	worldTransform_.Initialize();
 	viewProjection_.Initialize();
+	enemyWorldTransform_.Initialize();
+	enemyViewProjection_.Initialize();
 
 	debugCamera_ = new DebugCamera(1280, 720);
 
 	player_ = new Player();
 	player_->Initialize(model_, textureHandle_, worldTransform_);
+
+	enemyWorldTransform_.translation_.y = 1;
+	enemy_ = new Enemy();
+	enemy_->Initialize(enemyModel_, enemyTextureHandle_, enemyWorldTransform_);
+	
 }
 
 void GameScene::Update() {
 	player_->Update();
 	player_->Rotate();
+	enemy_->Update();
 	debugCamera_->Update();
 #ifdef _DEBUG
 	if (input_->TriggerKey(DIK_SPACE)) {
@@ -76,6 +87,7 @@ void GameScene::Draw() {
 	/// </summary>
 
 	player_->Draw(viewProjection_);
+	enemy_->Draw(enemyViewProjection_);
 
 	// 3Dオブジェクト描画後処理
 	Model::PostDraw();
