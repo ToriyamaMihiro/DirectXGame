@@ -2,6 +2,7 @@
 #include "Affine.h"
 #include "ImGuiManager.h"
 #include "TextureManager.h"
+#include"Player.h"
 
 Enemy::~Enemy() {
 	for (EnemyBullet* bullet : bullets_) {
@@ -100,6 +101,7 @@ void Enemy::Fire() {
 	    player_worldPos.x - enemy_worldPos.x, player_worldPos.y - enemy_worldPos.y,
 	    player_worldPos.z - enemy_worldPos.z};
 
+	//正規化
 	float length = sqrt(
 	    subtraction.x * subtraction.x + subtraction.y * subtraction.y +
 	    subtraction.z * subtraction.z);
@@ -116,7 +118,7 @@ void Enemy::Fire() {
 	newSubtraction.y *= moveSpeed;
 	newSubtraction.z *= moveSpeed;
 
-	Vector3 velocity(0, 0, kBulletSpeed);
+	Vector3 velocity(newSubtraction);
 
 	// 速度ベクトルを自機の向きに合わせて回転する
 	velocity = TransformNormal(velocity, worldTransform_.matWorld_);
