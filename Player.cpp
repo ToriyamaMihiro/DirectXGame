@@ -89,6 +89,14 @@ void Player::Rotate() {
 		worldTransform_.rotation_.y += kRotSpeed;
 	}
 }
+Vector3 Player::GetWorldPosition() {
+	Vector3 worldPos;
+
+	worldPos.x = worldTransform_.translation_.x;
+	worldPos.y = worldTransform_.translation_.y;
+	worldPos.z = worldTransform_.translation_.z;
+	return worldPos;
+}
 void Player::Draw(ViewProjection& viewProjection) {
 	model_->Draw(worldTransform_, viewProjection, textureHandle_);
 	for (PlayerBullet* bullet : bullets_) {

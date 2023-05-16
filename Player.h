@@ -33,6 +33,8 @@ public:
 
 	void Rotate();
 
+	Vector3 GetWorldPosition();
+
 	/// <summary>
 	/// 描画
 	/// </summary>

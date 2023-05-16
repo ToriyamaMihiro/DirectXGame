@@ -9,8 +9,12 @@
 #include "WorldTransform.h"
 
 #include "EnemyBullet.h"
+#define _USE_MATH_DEFINES
+#include <math.h>
 // #include "math.h"
 #include <list>
+
+class Player;
 
 enum class Phase {
 	Approach,
@@ -43,6 +47,10 @@ public:
 
 	void ApproachUpdate();
 
+	void SetPlayer(Player* player) { player_ = player; };
+
+	Vector3 GetWorldPosition();
+
 	/// <summary>
 	/// •`‰æ
 	/// </summary>
@@ -56,4 +64,5 @@ private:
 	Input* input_ = nullptr;
 	int32_t fire_timer = 0;
 	Phase phase_ = Phase::Approach;
+	Player* player_ = nullptr;
 };

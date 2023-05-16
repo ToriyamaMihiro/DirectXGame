@@ -2,7 +2,6 @@
 #include "Affine.h"
 #include "ImGuiManager.h"
 #include "TextureManager.h"
-#include <cassert>
 
 Enemy::~Enemy() {
 	for (EnemyBullet* bullet : bullets_) {
@@ -18,7 +17,7 @@ void Enemy::Initialize(Model* model, uint32_t textureHandle, WorldTransform worl
 	input_ = Input::GetInstance();
 	worldTransform_.Initialize();
 	viewProjection_.Initialize();
-	//Fire();
+	// Fire();
 	ApproachInitialize();
 }
 
@@ -56,7 +55,6 @@ void Enemy::Update() {
 	ImGui::Begin("Debug1");
 	ImGui::Text("%f", fire_timer);
 
-
 	ImGui::End();
 
 	const float kMoveLimitX = 34;
@@ -70,20 +68,20 @@ void Enemy::Update() {
 	// 行動パターン
 	/*switch (phase_) {
 	case Phase::Approach:
-		move.z += kCharactorSpeed;
-		worldTransform_.translation_.z += move.z;
-		if (worldTransform_.translation_.z < 0.0f) {
-			phase_ = Phase::Leave;
-		}
-		break;
+	    move.z += kCharactorSpeed;
+	    worldTransform_.translation_.z += move.z;
+	    if (worldTransform_.translation_.z < 0.0f) {
+	        phase_ = Phase::Leave;
+	    }
+	    break;
 	case Phase::Leave:
-		move.x += kCharactorSpeed;
-		move.y += kCharactorSpeed;
-		worldTransform_.translation_.x += move.x;
-		worldTransform_.translation_.y -= move.y;
-		break;
+	    move.x += kCharactorSpeed;
+	    move.y += kCharactorSpeed;
+	    worldTransform_.translation_.x += move.x;
+	    worldTransform_.translation_.y -= move.y;
+	    break;
 	default:
-		break;
+	    break;
 	}*/
 	ApproachUpdate();
 	for (EnemyBullet* bullet : bullets_) {
@@ -92,7 +90,32 @@ void Enemy::Update() {
 }
 
 void Enemy::Fire() {
+	assert(player_);
+
 	const float kBulletSpeed = -0.2f;
+
+	Vector3 player_worldPos = player_->GetWorldPosition();
+	Vector3 enemy_worldPos = GetWorldPosition();
+	Vector3 subtraction = {
+	    player_worldPos.x - enemy_worldPos.x, player_worldPos.y - enemy_worldPos.y,
+	    player_worldPos.z - enemy_worldPos.z};
+
+	float length = sqrt(
+	    subtraction.x * subtraction.x + subtraction.y * subtraction.y +
+	    subtraction.z * subtraction.z);
+
+	Vector3 newSubtraction = {subtraction.x, subtraction.y, subtraction.z};
+
+	if (length != 0.0f) {
+
+		newSubtraction = {subtraction.x / length, subtraction.y / length, subtraction.z / length};
+	}
+	float moveSpeed = 1.0f;
+
+	newSubtraction.x *= moveSpeed;
+	newSubtraction.y *= moveSpeed;
+	newSubtraction.z *= moveSpeed;
+
 	Vector3 velocity(0, 0, kBulletSpeed);
 
 	// 速度ベクトルを自機の向きに合わせて回転する
@@ -105,10 +128,7 @@ void Enemy::Fire() {
 	bullets_.push_back(newBullet);
 }
 
-void Enemy::ApproachInitialize() {
-	
-	fire_timer = kFireInterval;
-}
+void Enemy::ApproachInitialize() { fire_timer = kFireInterval; }
 
 void Enemy::ApproachUpdate() {
 	fire_timer--;
@@ -116,6 +136,15 @@ void Enemy::ApproachUpdate() {
 		Fire();
 		fire_timer = kFireInterval;
 	}
+}
+
+Vector3 Enemy::GetWorldPosition() {
+	Vector3 worldPos;
+
+	worldPos.x = worldTransform_.translation_.x;
+	worldPos.y = worldTransform_.translation_.y;
+	worldPos.z = worldTransform_.translation_.z;
+	return worldPos;
 }
 
 void Enemy::Draw(ViewProjection& viewProjection) {
