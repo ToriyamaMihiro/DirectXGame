@@ -25,12 +25,15 @@ public:
 	/// </summary>
 	void Update();
 
+	bool IsDead() const { return isDead_; }
 
+	void OnCollision();
+
+	Vector3 GetWorldPosition();
 
 	/// <summary>
 	/// •`‰æ
 	/// </summary>
 	void Draw(const ViewProjection& viewProjection);
 
-	bool IsDead() const { return isDead_; }
 };

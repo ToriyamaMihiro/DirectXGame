@@ -10,12 +10,13 @@
 #include "WorldTransform.h"
 
 #include "PlayerBullet.h"
-//#include "math.h"
-#include<list>
+// #include "math.h"
+#include <list>
 class Player {
 
 public:
-//std::list<PlayerBullet*>bullets_;
+	std::list<PlayerBullet*> bullets_;
+	const std::list<PlayerBullet*>& GetBullets() { return bullets_; }
 	/// <summary>
 	/// デストラクタ
 	/// </summary>
@@ -34,6 +35,8 @@ public:
 	void Rotate();
 
 	Vector3 GetWorldPosition();
+
+	void OnCollision();
 
 	/// <summary>
 	/// 描画

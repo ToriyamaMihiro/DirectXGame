@@ -25,6 +25,7 @@ class Enemy {
 
 public:
 	std::list<EnemyBullet*> bullets_;
+	const std::list<EnemyBullet*>& GetBullets() { return bullets_; }
 	static const int kFireInterval = 60;
 	/// <summary>
 	/// デストラクタ
@@ -50,6 +51,8 @@ public:
 	void SetPlayer(Player* player) { player_ = player; };
 
 	Vector3 GetWorldPosition();
+
+	void OnCollision();
 
 	/// <summary>
 	/// 描画

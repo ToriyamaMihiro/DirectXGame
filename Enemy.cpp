@@ -93,7 +93,7 @@ void Enemy::Update() {
 void Enemy::Fire() {
 	assert(player_);
 
-	const float kBulletSpeed = -0.2f;
+	const float kBulletSpeed = 1.0f;
 
 	Vector3 player_worldPos = player_->GetWorldPosition();
 	Vector3 enemy_worldPos = GetWorldPosition();
@@ -112,11 +112,10 @@ void Enemy::Fire() {
 
 		newSubtraction = {subtraction.x / length, subtraction.y / length, subtraction.z / length};
 	}
-	float moveSpeed = 1.0f;
 
-	newSubtraction.x *= moveSpeed;
-	newSubtraction.y *= moveSpeed;
-	newSubtraction.z *= moveSpeed;
+	newSubtraction.x *= kBulletSpeed;
+	newSubtraction.y *= kBulletSpeed;
+	newSubtraction.z *= kBulletSpeed;
 
 	Vector3 velocity(newSubtraction);
 
@@ -148,6 +147,8 @@ Vector3 Enemy::GetWorldPosition() {
 	worldPos.z = worldTransform_.translation_.z;
 	return worldPos;
 }
+
+void Enemy::OnCollision() {}
 
 void Enemy::Draw(ViewProjection& viewProjection) {
 	model_->Draw(worldTransform_, viewProjection, textureHandle_);

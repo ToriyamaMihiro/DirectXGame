@@ -60,6 +60,22 @@ void GameScene::Update() {
 	}
 }
 
+
+void GameScene::CheckAllCollisions() {
+//判定対象AとBの座標
+	Vector3 posA, posB;
+	//自弾リストの取得
+	const std::list<PlayerBullet*>& playerBullets = player_->GetBullets();
+	// 敵弾リストの取得
+	const std::list<EnemyBullet*>& enemyBullets = enemy_->GetBullets();
+
+	//自キャラと敵弾の当たり判定
+	posA = player_->GetWorldPosition();
+	for (EnemyBullet* bullet : enemyBullets) {
+	//posB=enemyBullets.Get
+	}
+}
+
 void GameScene::Draw() {
 
 	// コマンドリストの取得

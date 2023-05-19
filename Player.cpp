@@ -97,6 +97,7 @@ Vector3 Player::GetWorldPosition() {
 	worldPos.z = worldTransform_.translation_.z;
 	return worldPos;
 }
+void Player::OnCollision() {}
 void Player::Draw(ViewProjection& viewProjection) {
 	model_->Draw(worldTransform_, viewProjection, textureHandle_);
 	for (PlayerBullet* bullet : bullets_) {

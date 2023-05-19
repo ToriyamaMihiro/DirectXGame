@@ -12,6 +12,8 @@
 
 #include "Player.h"
 #include"Enemy.h"
+#include "EnemyBullet.h"
+#include "PlayerBullet.h"
 
 /// <summary>
 /// ゲームシーン
@@ -38,6 +40,8 @@ public: // メンバ関数
 	/// 毎フレーム処理
 	/// </summary>
 	void Update();
+
+	void CheckAllCollisions();
 
 	/// <summary>
 	/// 描画
