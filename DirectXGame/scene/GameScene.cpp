@@ -2,7 +2,6 @@
 #include "TextureManager.h"
 #include <cassert>
 
-
 GameScene::GameScene() {}
 
 GameScene::~GameScene() {
@@ -43,6 +42,7 @@ void GameScene::Update() {
 	player_->Rotate();
 	enemy_->Update();
 	debugCamera_->Update();
+	CheckAllCollisions();
 #ifdef _DEBUG
 	if (input_->TriggerKey(DIK_SPACE)) {
 		isDebugCameraActive_ = 1;
@@ -52,29 +52,69 @@ void GameScene::Update() {
 	if (isDebugCameraActive_) {
 		debugCamera_->Update();
 		viewProjection_.matView = debugCamera_->GetViewProjection().matView;
-		viewProjection_.matProjection = debugCamera_->GetViewProjection().matProjection; 
-	viewProjection_.TransferMatrix();
+		viewProjection_.matProjection = debugCamera_->GetViewProjection().matProjection;
+		viewProjection_.TransferMatrix();
 
 	} else {
-	viewProjection_.UpdateMatrix();
+		viewProjection_.UpdateMatrix();
 	}
 }
 
-
 void GameScene::CheckAllCollisions() {
-//判定対象AとBの座標
+	// 判定対象AとBの座標
 	Vector3 posA, posB;
-	//自弾リストの取得
+	Vector3 posC, posD;
+
+	// 自弾リストの取得
 	const std::list<PlayerBullet*>& playerBullets = player_->GetBullets();
 	// 敵弾リストの取得
 	const std::list<EnemyBullet*>& enemyBullets = enemy_->GetBullets();
 
-	//自キャラと敵弾の当たり判定
+	// 自キャラと敵弾の当たり判定
 	posA = player_->GetWorldPosition();
-	//for (EnemyBullet* bullet : enemyBullets) {
-	////posB=enemyBullets.Get
-	//}
-}
+	for (EnemyBullet* bullet : enemyBullets) {
+		posB = bullet->GetWorldPosition();
+		int radiusA = 2;
+		int radiusB = 2;
+
+		Vector3 AtB = {posB.x - posA.x, posB.y - posA.y, posB.z - posA.z};
+
+		if (AtB.x * AtB.x + AtB.y * AtB.y + AtB.z * AtB.z <=
+		    (radiusA + radiusB) * (radiusA + radiusB)) {
+			player_->OnCollision();
+			bullet->OnCollision();
+		}
+	}
+	posC = enemy_->GetWorldPosition();
+	for (PlayerBullet* bullet : playerBullets) {
+		posD = bullet->GetWorldPosition();
+		int radiusC = 2;
+		int radiusD = 2;
+
+		Vector3 CtD = {posD.x - posC.x, posD.y - posC.y, posD.z - posC.z};
+
+		if (CtD.x * CtD.x + CtD.y * CtD.y + CtD.z * CtD.z <=
+		    (radiusC + radiusD) * (radiusC + radiusD)) {
+			enemy_->OnCollision();
+			bullet->OnCollision();
+		}
+	}
+	for (EnemyBullet* enemy_bullet : enemyBullets) {
+		for (PlayerBullet* player_bullet : playerBullets) {
+			posB = enemy_bullet->GetWorldPosition();
+			posD = player_bullet->GetWorldPosition();
+			int radiusB = 2;
+			int radiusD = 2;
+			Vector3 BtD = {posD.x - posB.x, posD.y - posB.y, posD.z - posB.z};
+			if (BtD.x * BtD.x + BtD.y * BtD.y + BtD.z * BtD.z <=
+			    (radiusB + radiusD) * (radiusB + radiusD)) {
+				enemy_bullet->OnCollision();
+				player_bullet->OnCollision();
+			}
+
+		}
+	}
+	}
 
 void GameScene::Draw() {
 

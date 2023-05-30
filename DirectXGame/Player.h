@@ -51,5 +51,5 @@ private:
 	WorldTransform worldTransform_;
 	ViewProjection viewProjection_;
 	Input* input_ = nullptr;
-	//std::list<PlayerBullet*> bullets_;
+	
 };
