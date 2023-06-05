@@ -99,6 +99,7 @@ Vector3 Player::GetWorldPosition() {
 	return worldPos;
 }
 void Player::OnCollision() {}
+
 void Player::Draw(ViewProjection& viewProjection) {
 	model_->Draw(worldTransform_, viewProjection, textureHandle_);
 	for (PlayerBullet* bullet : bullets_) {

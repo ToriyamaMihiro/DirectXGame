@@ -14,6 +14,7 @@
 #include"Enemy.h"
 #include "EnemyBullet.h"
 #include "PlayerBullet.h"
+#include "Skydome.h"
 
 /// <summary>
 /// ゲームシーン
@@ -54,17 +55,24 @@ private: // メンバ変数
 	Audio* audio_ = nullptr;
 	uint32_t textureHandle_ = 0;
 	uint32_t enemyTextureHandle_ = 0;
+	uint32_t skydomeTextureHandle_ = 0;
 	Model* model_ = nullptr;
 	Model* enemyModel_ = nullptr;
+	Model* skydomeModel_ = nullptr;
+
 	WorldTransform worldTransform_;
 	ViewProjection viewProjection_;
 	WorldTransform enemyWorldTransform_;
 	ViewProjection enemyViewProjection_;
+	WorldTransform skydomeWorldTransform_;
+	ViewProjection skydomeViewProjection_;
+
 	DebugCamera* debugCamera_ = nullptr;
 	int isDebugCameraActive_ = 0;
 
 	Player* player_ = nullptr;
 	Enemy* enemy_ = nullptr;
+	Skydome* skydome_ = nullptr;
 
 	/// <summary>
 	/// ゲームシーン用
