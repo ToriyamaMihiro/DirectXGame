@@ -10,14 +10,16 @@ Player::~Player() {
 	}
 }
 
-void Player::Initialize(Model* model, uint32_t textureHandle, WorldTransform worldTransform) {
+void Player::Initialize(Model* model, uint32_t textureHandle, Vector3 position) {
 	assert(model);
 	model_ = model;
 	textureHandle_ = textureHandle;
-	worldTransform_ = worldTransform;
+	position_ = position;
 	input_ = Input::GetInstance();
 	worldTransform_.Initialize();
 	viewProjection_.Initialize();
+
+	worldTransform_.translation_ = position_;
 }
 
 void Player::Update() {
@@ -90,15 +92,19 @@ void Player::Rotate() {
 		worldTransform_.rotation_.y += kRotSpeed;
 	}
 }
+
 Vector3 Player::GetWorldPosition() {
 	Vector3 worldPos;
 
-	worldPos.x = worldTransform_.translation_.x;
-	worldPos.y = worldTransform_.translation_.y;
-	worldPos.z = worldTransform_.translation_.z;
+	worldPos.x = worldTransform_.matWorld_.m[3][0];
+	worldPos.y = worldTransform_.matWorld_.m[3][1];
+	worldPos.z = worldTransform_.matWorld_.m[3][2];
 	return worldPos;
 }
+
 void Player::OnCollision() {}
+
+void Player::SetParent(const WorldTransform* parent) { worldTransform_.parent_ = parent; }
 
 void Player::Draw(ViewProjection& viewProjection) {
 	model_->Draw(worldTransform_, viewProjection, textureHandle_);
@@ -117,9 +123,11 @@ void Player::Attack() {
 		// 速度ベクトルを自機の向きに合わせて回転する
 		velocity = TransformNormal(velocity, worldTransform_.matWorld_);
 
+		Vector3 worldPosition;
 		// 弾を生成して初期化
+		worldPosition = GetWorldPosition();
 		PlayerBullet* newBullet = new PlayerBullet();
-		newBullet->Initialize(model_, worldTransform_.translation_, velocity);
+		newBullet->Initialize(model_, worldPosition, velocity);
 
 		bullets_.push_back(newBullet);
 		/*if (bullet_) {

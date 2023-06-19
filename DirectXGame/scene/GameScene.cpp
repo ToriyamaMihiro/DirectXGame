@@ -10,6 +10,7 @@ GameScene::~GameScene() {
 	delete enemy_;
 	delete skydome_;
 	delete debugCamera_;
+	delete railCamera_;
 }
 
 void GameScene::Initialize() {
@@ -24,25 +25,25 @@ void GameScene::Initialize() {
 	skydomeModel_ = Model::CreateFromOBJ("tenkyu", true);
 	worldTransform_.Initialize();
 	viewProjection_.Initialize();
-	enemyWorldTransform_.Initialize();
-	enemyViewProjection_.Initialize();
-	skydomeWorldTransform_.Initialize();
-	skydomeViewProjection_.Initialize();
 
 	debugCamera_ = new DebugCamera(1280, 720);
 
-	player_ = new Player();
-	player_->Initialize(model_, textureHandle_, worldTransform_);
+	railCamera_ = new RailCamera;
+	railCamera_->Initialize(worldTransform_, worldTransform_.rotation_);
 
-	enemyWorldTransform_.translation_.y = 1;
-	enemyWorldTransform_.translation_.z = 20;
+	player_ = new Player();
+	Vector3 playerPosition(0, 0, 20);	
+	player_->Initialize(model_,textureHandle_, playerPosition);
+	player_->SetParent(&railCamera_->GetWorldTransform());
+
 	enemy_ = new Enemy();
-	enemy_->Initialize(enemyModel_, enemyTextureHandle_, enemyWorldTransform_);
+	enemy_->Initialize(enemyModel_, enemyTextureHandle_, worldTransform_);
 	enemy_->SetPlayer(player_);
 
 	skydome_ = new Skydome();
-	skydome_->Initialize(skydomeModel_,skydomeWorldTransform_);
-	skydomeWorldTransform_.translation_ = {0,0,0};
+	skydome_->Initialize(skydomeModel_, worldTransform_);
+
+	
 }
 
 void GameScene::Update() {
@@ -51,8 +52,16 @@ void GameScene::Update() {
 	enemy_->Update();
 	skydome_->Update();
 	debugCamera_->Update();
+	railCamera_->Update();
 
 	CheckAllCollisions();
+	viewProjection_.UpdateMatrix();
+
+	viewProjection_.matView = railCamera_->GetViewProjection().matView;
+	viewProjection_.matProjection = railCamera_->GetViewProjection().matProjection;
+
+	viewProjection_.TransferMatrix();
+
 #ifdef _DEBUG
 	if (input_->TriggerKey(DIK_Z)) {
 		isDebugCameraActive_ = 1;
@@ -61,21 +70,11 @@ void GameScene::Update() {
 
 	if (isDebugCameraActive_) {
 		debugCamera_->Update();
-		skydomeViewProjection_.matView = debugCamera_->GetViewProjection().matView;
-		skydomeViewProjection_.matProjection = debugCamera_->GetViewProjection().matProjection;
-		skydomeViewProjection_.TransferMatrix();
+
 		viewProjection_.matView = debugCamera_->GetViewProjection().matView;
 		viewProjection_.matProjection = debugCamera_->GetViewProjection().matProjection;
 		viewProjection_.TransferMatrix();
-		enemyViewProjection_.matView = debugCamera_->GetViewProjection().matView;
-		enemyViewProjection_.matProjection = debugCamera_->GetViewProjection().matProjection;
-		enemyViewProjection_.TransferMatrix();
-
-	} else {
-		skydomeViewProjection_.UpdateMatrix();
-		viewProjection_.UpdateMatrix();
-		enemyViewProjection_.UpdateMatrix();
-	}
+	} 
 }
 
 void GameScene::CheckAllCollisions() {
@@ -129,10 +128,9 @@ void GameScene::CheckAllCollisions() {
 				enemy_bullet->OnCollision();
 				player_bullet->OnCollision();
 			}
-
 		}
 	}
-	}
+}
 
 void GameScene::Draw() {
 
@@ -162,10 +160,8 @@ void GameScene::Draw() {
 	/// </summary>
 
 	player_->Draw(viewProjection_);
-	enemy_->Draw(enemyViewProjection_);
-	skydome_->Draw(skydomeViewProjection_);
-
-
+	enemy_->Draw(viewProjection_);
+	skydome_->Draw(viewProjection_);
 
 	// 3Dオブジェクト描画後処理
 	Model::PostDraw();

@@ -20,6 +20,8 @@ void Enemy::Initialize(Model* model, uint32_t textureHandle, WorldTransform worl
 	viewProjection_.Initialize();
 	// Fire();
 	ApproachInitialize();
+	worldTransform_.translation_ = {5, 0, 20};
+
 }
 
 void Enemy::Update() {
@@ -37,7 +39,7 @@ void Enemy::Update() {
 
 	const float kCharactorSpeed = +0.1f;
 
-	move.x += kCharactorSpeed;
+	//move.x += kCharactorSpeed;
 
 	MakeScaleMatrix(worldTransform_.scale_);
 

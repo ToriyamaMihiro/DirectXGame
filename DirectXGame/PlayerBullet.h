@@ -16,6 +16,7 @@ private:
 	bool isDead_ = false;
 	
 public:
+
 	/// <summary>
 	/// 初期化
 	/// </summary>

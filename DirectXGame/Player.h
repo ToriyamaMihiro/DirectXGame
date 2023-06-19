@@ -17,6 +17,7 @@ class Player {
 public:
 	std::list<PlayerBullet*> bullets_;
 	const std::list<PlayerBullet*>& GetBullets() { return bullets_; }
+
 	/// <summary>
 	/// デストラクタ
 	/// </summary>
@@ -25,7 +26,7 @@ public:
 	/// <summary>
 	/// 初期化
 	/// </summary>
-	void Initialize(Model* model, uint32_t textureHandle, WorldTransform worldTransform);
+	void Initialize(Model* model, uint32_t textureHandle, Vector3 position);
 
 	/// <summary>
 	/// 毎フレーム処理
@@ -37,6 +38,10 @@ public:
 	Vector3 GetWorldPosition();
 
 	void OnCollision();
+
+	//親となるワールドトランスフォームをセット
+	void SetParent(const WorldTransform* parent);
+
 
 	/// <summary>
 	/// 描画
@@ -50,6 +55,7 @@ private:
 	Model* model_ = nullptr;
 	WorldTransform worldTransform_;
 	ViewProjection viewProjection_;
+	Vector3 position_;
 	Input* input_ = nullptr;
-	
+
 };

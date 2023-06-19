@@ -26,3 +26,4 @@ Vector3 Transform(Vector3& vector, Matrix4x4 matrix);
 
 Vector3 TransformNormal(const Vector3& v, const Matrix4x4& m);
 
+Matrix4x4 Inverse(const Matrix4x4& m);

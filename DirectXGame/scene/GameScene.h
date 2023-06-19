@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Audio.h"
+#include "DebugCamera.h"
 #include "DirectXCommon.h"
 #include "Input.h"
 #include "Model.h"
@@ -8,12 +9,12 @@
 #include "Sprite.h"
 #include "ViewProjection.h"
 #include "WorldTransform.h"
-#include"DebugCamera.h"
 
-#include "Player.h"
-#include"Enemy.h"
+#include "Enemy.h"
 #include "EnemyBullet.h"
+#include "Player.h"
 #include "PlayerBullet.h"
+#include "RailCamera.h"
 #include "Skydome.h"
 
 /// <summary>
@@ -56,16 +57,13 @@ private: // メンバ変数
 	uint32_t textureHandle_ = 0;
 	uint32_t enemyTextureHandle_ = 0;
 	uint32_t skydomeTextureHandle_ = 0;
+
 	Model* model_ = nullptr;
 	Model* enemyModel_ = nullptr;
 	Model* skydomeModel_ = nullptr;
 
 	WorldTransform worldTransform_;
 	ViewProjection viewProjection_;
-	WorldTransform enemyWorldTransform_;
-	ViewProjection enemyViewProjection_;
-	WorldTransform skydomeWorldTransform_;
-	ViewProjection skydomeViewProjection_;
 
 	DebugCamera* debugCamera_ = nullptr;
 	int isDebugCameraActive_ = 0;
@@ -73,6 +71,7 @@ private: // メンバ変数
 	Player* player_ = nullptr;
 	Enemy* enemy_ = nullptr;
 	Skydome* skydome_ = nullptr;
+	RailCamera* railCamera_ = nullptr;
 
 	/// <summary>
 	/// ゲームシーン用
