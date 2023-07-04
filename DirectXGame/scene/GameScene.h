@@ -11,11 +11,12 @@
 #include "WorldTransform.h"
 
 #include "Enemy.h"
-#include "EnemyBullet.h"
+
 #include "Player.h"
-#include "PlayerBullet.h"
+#include <cassert>
 #include "RailCamera.h"
 #include "Skydome.h"
+#include<sstream>
 
 /// <summary>
 /// ゲームシーン
@@ -23,6 +24,17 @@
 class GameScene {
 
 public: // メンバ関数
+
+	std::list<EnemyBullet*> bullets_;
+	const std::list<EnemyBullet*>& GetBullets() { return bullets_; }
+
+	std::list<Enemy*> enemys_;
+	const std::list<Enemy*>& EnemyGetBullets() { return enemys_; }
+	static const int kFireInterval = 60;
+
+	std::stringstream enemyPopCommands;
+
+
 	/// <summary>
 	/// コンストクラタ
 	/// </summary>
@@ -43,12 +55,29 @@ public: // メンバ関数
 	/// </summary>
 	void Update();
 
+	void SetEnemy(const Vector3 position);
+
 	void CheckAllCollisions();
+
+	void AddEnemyBullet(EnemyBullet* enemyBullet);
+
+	void Fire();
+
+	void ApproachInitialize();
+
+	void ApproachUpdate();
+
+	void LoadEnemyPopDate();
+
+	void UpdateEnemyPopCommands();
 
 	/// <summary>
 	/// 描画
 	/// </summary>
 	void Draw();
+
+	
+
 
 private: // メンバ変数
 	DirectXCommon* dxCommon_ = nullptr;
@@ -68,10 +97,16 @@ private: // メンバ変数
 	DebugCamera* debugCamera_ = nullptr;
 	int isDebugCameraActive_ = 0;
 
+	int32_t fire_timer = 0;
+	Vector3 velocity_;
+	Vector3 enemy_pos;
+
 	Player* player_ = nullptr;
-	Enemy* enemy_ = nullptr;
 	Skydome* skydome_ = nullptr;
 	RailCamera* railCamera_ = nullptr;
+
+	int waitCount = 0;
+	int waitFlg = true;
 
 	/// <summary>
 	/// ゲームシーン用

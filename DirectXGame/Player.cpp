@@ -106,12 +106,6 @@ void Player::OnCollision() {}
 
 void Player::SetParent(const WorldTransform* parent) { worldTransform_.parent_ = parent; }
 
-void Player::Draw(ViewProjection& viewProjection) {
-	model_->Draw(worldTransform_, viewProjection, textureHandle_);
-	for (PlayerBullet* bullet : bullets_) {
-		bullet->Draw(viewProjection);
-	}
-}
 
 void Player::Attack() {
 	if (input_->TriggerKey(DIK_SPACE)) {
@@ -134,5 +128,12 @@ void Player::Attack() {
 		    delete bullet_;
 		    bullet_ = nullptr;
 		}*/
+	}
+}
+
+void Player::Draw(ViewProjection& viewProjection) {
+	model_->Draw(worldTransform_, viewProjection, textureHandle_);
+	for (PlayerBullet* bullet : bullets_) {
+		bullet->Draw(viewProjection);
 	}
 }

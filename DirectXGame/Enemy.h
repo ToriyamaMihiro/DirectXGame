@@ -15,6 +15,7 @@
 #include <list>
 
 class Player;
+class GameScene;
 
 enum class Phase {
 	Approach,
@@ -24,9 +25,6 @@ enum class Phase {
 class Enemy {
 
 public:
-	std::list<EnemyBullet*> bullets_;
-	const std::list<EnemyBullet*>& GetBullets() { return bullets_; }
-	static const int kFireInterval = 60;
 	/// <summary>
 	/// デストラクタ
 	/// </summary>
@@ -35,18 +33,13 @@ public:
 	/// <summary>
 	/// 初期化
 	/// </summary>
-	void Initialize(Model* model, uint32_t textureHandle, WorldTransform worldTransform);
+	void Initialize(
+	    Model* model, const Vector3& position, const Vector3& velocity);
 
 	/// <summary>
 	/// 毎フレーム処理
 	/// </summary>
 	void Update();
-
-	void Fire();
-
-	void ApproachInitialize();
-
-	void ApproachUpdate();
 
 	void SetPlayer(Player* player) { player_ = player; };
 
@@ -54,18 +47,27 @@ public:
 
 	void OnCollision();
 
+	bool IsDead() const { return isDead_; }
+
+	void SetGameScene(GameScene* gameScene) { gameScene_ = gameScene; };
+
 	/// <summary>
 	/// 描画
 	/// </summary>
 	void Draw(ViewProjection& viewProjection);
 
 private:
+	int32_t fire_timer = 0;
 	uint32_t textureHandle_ = 0u;
 	Model* model_ = nullptr;
 	WorldTransform worldTransform_;
 	ViewProjection viewProjection_;
 	Input* input_ = nullptr;
-	int32_t fire_timer = 0;
+	Vector3 position_;
+	Vector3 velocity_;
+	bool isDead_ = false;
+
 	Phase phase_ = Phase::Approach;
 	Player* player_ = nullptr;
+	GameScene* gameScene_ = nullptr;
 };
