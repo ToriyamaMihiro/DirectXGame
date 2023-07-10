@@ -39,6 +39,7 @@ void GameScene::Initialize() {
 
 	player_ = new Player();
 	Vector3 playerPosition(0, 0, 20);
+	
 	player_->Initialize(model_, textureHandle_, playerPosition);
 	player_->SetParent(&railCamera_->GetWorldTransform());
 
@@ -325,6 +326,8 @@ void GameScene::Draw() {
 #pragma region 前景スプライト描画
 	// 前景スプライト描画前処理
 	Sprite::PreDraw(commandList);
+
+	player_->DrawUI();
 
 	/// <summary>
 	/// ここに前景スプライトの描画処理を追加できる

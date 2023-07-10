@@ -306,3 +306,77 @@ Matrix4x4 Inverse(const Matrix4x4& m) {
 
 	return Inverse;
 }
+
+// 正規化
+float Dot(const Vector3& v1, const Vector3& v2) {
+	float dot;
+	dot = v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
+	return dot;
+}
+
+float Length(const Vector3& v) {
+	float Length;
+	Length = sqrtf(Dot(v, v));
+	return Length;
+}
+
+Vector3 Normalize(const Vector3& v) {
+	Vector3 Normalize;
+	Normalize.x = v.x / Length(v);
+	Normalize.y = v.y / Length(v);
+	Normalize.z = v.z / Length(v);
+
+	return Normalize;
+}
+
+Vector3 Scaler(float scaler, const Vector3& v) {
+	Vector3 Multiply;
+	Multiply.x = scaler * v.x;
+	Multiply.y = scaler * v.y;
+	Multiply.z = scaler * v.z;
+
+	return Multiply;
+}
+
+Vector3 Subtract(const Vector3& v1, const Vector3& v2) {
+	Vector3 Subtract;
+	Subtract.x = v1.x - v2.x;
+	Subtract.y = v1.y - v2.y;
+	Subtract.z = v1.z - v2.z;
+
+	return Subtract;
+
+
+}
+
+Vector3 Add(const Vector3& v1, const Vector3& v2) {
+	Vector3 Add;
+	Add.x = v1.x + v2.x;
+	Add.y = v1.y + v2.y;
+	Add.z = v1.z + v2.z;
+
+	return Add;
+}
+
+
+Matrix4x4 MakeViewportMatrix(
+    float left, float top, float width, float height, float minDepth, float maxDepth) {
+	Matrix4x4 MakeViewportMatrix;
+	MakeViewportMatrix.m[0][0] = width / 2;
+	MakeViewportMatrix.m[0][1] = 0;
+	MakeViewportMatrix.m[0][2] = 0;
+	MakeViewportMatrix.m[0][3] = 0;
+	MakeViewportMatrix.m[1][0] = 0;
+	MakeViewportMatrix.m[1][1] = -(height / 2);
+	MakeViewportMatrix.m[1][2] = 0;
+	MakeViewportMatrix.m[1][3] = 0;
+	MakeViewportMatrix.m[2][0] = 0;
+	MakeViewportMatrix.m[2][1] = 0;
+	MakeViewportMatrix.m[2][2] = maxDepth - minDepth;
+	MakeViewportMatrix.m[2][3] = 0;
+	MakeViewportMatrix.m[3][0] = left + (width / 2);
+	MakeViewportMatrix.m[3][1] = top + (height / 2);
+	MakeViewportMatrix.m[3][2] = minDepth;
+	MakeViewportMatrix.m[3][3] = 1;
+	return MakeViewportMatrix;
+}

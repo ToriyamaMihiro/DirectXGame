@@ -37,25 +37,33 @@ public:
 
 	Vector3 GetWorldPosition();
 
+	Vector3 Get3DWorldPosition();
+
 	void OnCollision();
 
-	//親となるワールドトランスフォームをセット
+	// 親となるワールドトランスフォームをセット
 	void SetParent(const WorldTransform* parent);
 
+	WorldTransform worldTransform3DReticle_;
 
+	void Attack();
+
+	void DrawUI();
 	/// <summary>
 	/// 描画
 	/// </summary>
 	void Draw(ViewProjection& viewProjection);
 
-	void Attack();
 
 private:
+	Sprite* sprite2DReiticle_ = nullptr;
 	uint32_t textureHandle_ = 0u;
+	uint32_t textureReticle = 0u;
 	Model* model_ = nullptr;
 	WorldTransform worldTransform_;
 	ViewProjection viewProjection_;
 	Vector3 position_;
 	Input* input_ = nullptr;
+
 
 };
