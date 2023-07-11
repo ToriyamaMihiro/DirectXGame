@@ -23,8 +23,9 @@ void Player::Initialize(Model* model, uint32_t textureHandle, Vector3 position) 
 
 	worldTransform_.translation_ = position_;
 	worldTransform3DReticle_.Initialize();
+	
 	sprite2DReiticle_ =
-	    Sprite::Create(textureReticle, Vector2(700, 700), Vector4(1, 1, 1, 1), Vector2(0.5f, 0.5f));
+	    Sprite::Create(textureReticle, Vector2(700,700), Vector4(1, 1, 1, 1), Vector2(0.5f, 0.5f));
 	sprite2DReiticle_->SetSize(Vector2(200, 200));
 }
 
@@ -41,15 +42,7 @@ void Player::Update() {
 
 	const float kCharactorSpeed = 0.2f;
 
-	if (input_->PushKey(DIK_LEFT)) {
-		move.x -= kCharactorSpeed;
-	} else if (input_->PushKey(DIK_RIGHT)) {
-		move.x += kCharactorSpeed;
-	} else if (input_->PushKey(DIK_UP)) {
-		move.y += kCharactorSpeed;
-	} else if (input_->PushKey(DIK_DOWN)) {
-		move.y -= kCharactorSpeed;
-	}
+
 
 	// 左右上下移動
 	MakeScaleMatrix(worldTransform_.scale_);
@@ -64,6 +57,14 @@ void Player::Update() {
 	worldTransform_.matWorld_ = MakeAffinMatrix(
 	    worldTransform_.scale_, worldTransform_.rotation_, worldTransform_.translation_);
 	worldTransform_.UpdateMatrix();
+
+	// ゲームパッド状態のを得る変数
+	XINPUT_STATE joyState;
+	// ゲームパッド状態の取得
+	if (Input::GetInstance()->GetJoystickState(0, joyState)) {
+		move.x += (float)joyState.Gamepad.sThumbLX / SHRT_MAX * kCharactorSpeed;
+		move.y += (float)joyState.Gamepad.sThumbLY / SHRT_MAX * kCharactorSpeed;
+	}
 
 	worldTransform_.translation_.x += move.x; // プレイヤーの座標 + 移動ベクトル
 	worldTransform_.translation_.y += move.y;
@@ -108,9 +109,69 @@ void Player::Update() {
 	    MakeViewportMatrix(0, 0, WinApp::kWindowWidth, WinApp::kWindowHeight, 0, 1);
 	// ビュー後y列とプロジェクション行列、ビューポート行列を合成する
 	Matrix4x4 matViewProjectionViewport =
-	    Multiply(Multiply(viewProjection_.matView, viewProjection_.matProjection) , matViewport);
+	    Multiply(Multiply(viewProjection_.matView, viewProjection_.matProjection), matViewport);
+
 	positionReticle = Transform(positionReticle, matViewProjectionViewport);
-	sprite2DReiticle_->SetPosition(Vector2(positionReticle.x, positionReticle.y));
+
+	//マウスを取得
+	GetPointer();
+	
+}
+
+void Player::GetPointer() {
+	// マウス座標(スクリーン座標)を取得する
+	POINT mousePosition;
+	GetCursorPos(&mousePosition);
+
+	// スプライトの現在座標を取得
+	Vector2 spritePosition = sprite2DReiticle_->GetPosition();
+	 XINPUT_STATE joyState;
+	// クライアントエリア座標に変換する
+	HWND hwnd = WinApp::GetInstance()->GetHwnd();
+	ScreenToClient(hwnd, &mousePosition);
+	
+
+	if (Input::GetInstance()->GetJoystickState(0, joyState)) {
+		spritePosition.x += (float)joyState.Gamepad.sThumbRX / SHRT_MAX * 5.0f;
+		spritePosition.y -= (float)joyState.Gamepad.sThumbRY / SHRT_MAX * 5.0f;
+		// スプライトの座標変更を反映
+		sprite2DReiticle_->SetPosition(spritePosition);
+	}
+	Matrix4x4 matViewport =
+	    MakeViewportMatrix(0, 0, WinApp::kWindowWidth, WinApp::kWindowHeight, 0, 1);
+	// ビュープロジェクションビューポート行列合成行列
+	Matrix4x4 matVPV =
+	    Multiply(Multiply(viewProjection_.matView, viewProjection_.matProjection), matViewport);
+	// 合成行列を計算する
+	Matrix4x4 matInverseVPV = Inverse(matVPV);
+
+	// スクリーン座標
+	Vector3 posNear = Vector3(spritePosition.x, spritePosition.y, 0);
+	Vector3 posFar = Vector3(spritePosition.x, spritePosition.y, 1);
+
+	//スクリーン座標系からワールド座標系に変換
+	posNear = Transform(posNear, matInverseVPV);
+	posFar = Transform(posFar, matInverseVPV);
+
+	//マウスレイの方向
+	Vector3 mouseDirection = Subtract(posFar, posNear);
+	mouseDirection = Normalize(mouseDirection);
+
+	//カメラから標準オブジェクトの距離
+	const float kDistanceTestObject = 100;
+	worldTransform3DReticle_.translation_ =Add(posNear, Scaler(kDistanceTestObject,mouseDirection));
+
+	worldTransform3DReticle_.UpdateMatrix();
+
+	ImGui::Begin("Player");
+	ImGui::Text("2DReticle:(%f,%f)", spritePosition.x, spritePosition.y);
+	ImGui::Text("Near:(%+.2f,%+.2f)", posNear.x, posNear.y, posNear.z);
+	ImGui::Text("Far:(%+.2f,%+.2f)", posFar.x, posFar.y, posFar.z);
+	ImGui::Text(
+	    "3DReticle:(5+.2f,%+.2f,%+.2f)", worldTransform3DReticle_.translation_.x,
+	    worldTransform3DReticle_.translation_.y, worldTransform3DReticle_.translation_.z);
+	ImGui::End();
+
 }
 
 void Player::Rotate() {
@@ -145,7 +206,14 @@ void Player::OnCollision() {}
 void Player::SetParent(const WorldTransform* parent) { worldTransform_.parent_ = parent; }
 
 void Player::Attack() {
-	if (input_->TriggerKey(DIK_SPACE)) {
+
+	XINPUT_STATE joyState;
+	if (!Input::GetInstance()->GetJoystickState(0, joyState)) {
+		return;
+	}
+
+	if (joyState.Gamepad.wButtons&XINPUT_GAMEPAD_RIGHT_SHOULDER){
+	
 
 		// 弾の速度
 		const float kBulletSpeed = 1.0f;

@@ -33,6 +33,8 @@ public:
 	/// </summary>
 	void Update();
 
+	void GetPointer();
+
 	void Rotate();
 
 	Vector3 GetWorldPosition();
@@ -65,5 +67,5 @@ private:
 	Vector3 position_;
 	Input* input_ = nullptr;
 
-
+	
 };
