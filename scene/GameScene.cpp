@@ -7,6 +7,8 @@
 
 GameScene::GameScene() {}
 
+
+
 GameScene::~GameScene() {
 	delete sprite_;
 	delete model_;
